@@ -358,57 +358,66 @@ export class GameScene extends Phaser.Scene {
     // Freeze bike
     (this.bike.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
 
-    // Shake + red flash
-    this.cameras.main.shake(600, 0.02);
-    this.cameras.main.flash(300, 255, 0, 0, false);
+    // Shake + red flash — stop any running camera effects first
+    this.cameras.main.stopFollow();
+    this.cameras.main.shake(500, 0.02);
+    this.cameras.main.flash(250, 255, 0, 0, false);
 
-    // Game over overlay
-    const overlay = this.add.rectangle(
-      this.cameras.main.scrollX + this.scale.width / 2,
-      this.cameras.main.scrollY + this.scale.height / 2,
-      this.scale.width, this.scale.height, 0x000000, 0,
-    ).setDepth(100).setScrollFactor(0);
+    const W  = this.scale.width;
+    const H  = this.scale.height;
+    const cx = W / 2;
+    const cy = H / 2;
 
-    this.tweens.add({ targets: overlay, alpha: 0.75, duration: 600 });
+    // Fixed overlay — use scrollFactor(0) and position in SCREEN space (0,0 = top-left of viewport)
+    const overlay = this.add.rectangle(cx, cy, W, H, 0x000000, 0)
+      .setScrollFactor(0).setDepth(100);
+    this.tweens.add({ targets: overlay, alpha: 0.78, duration: 700 });
 
-    const cx = this.scale.width / 2;
-    const cy = this.scale.height / 2;
-
-    this.add.text(cx, cy - 70, '🚨 CAUGHT! 🚨', {
-      fontSize: '36px', fontFamily: 'Arial', fontStyle: 'bold',
+    // All text is scroll-factor 0, so x/y are SCREEN coords
+    this.add.text(cx, cy - 80, '🚨 CAUGHT! 🚨', {
+      fontSize: '38px', fontFamily: 'Arial', fontStyle: 'bold',
       color: '#ff4444', stroke: '#000000', strokeThickness: 6,
     }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
 
-    this.add.text(cx, cy - 20, chaser.chaserName, {
-      fontSize: '20px', fontFamily: 'Arial', fontStyle: 'bold',
+    this.add.text(cx, cy - 28, chaser.chaserName, {
+      fontSize: '22px', fontFamily: 'Arial', fontStyle: 'bold',
       color: '#ffd60a', stroke: '#000000', strokeThickness: 4,
     }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
 
-    this.add.text(cx, cy + 16, `"${chaser.catchMsg}"`, {
+    this.add.text(cx, cy + 14, `"${chaser.catchMsg}"`, {
       fontSize: '15px', fontFamily: 'Arial', fontStyle: 'italic',
       color: '#ffffff', stroke: '#000000', strokeThickness: 3,
-      align: 'center', wordWrap: { width: 420 },
+      align: 'center', wordWrap: { width: 440 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
 
-    this.add.text(cx, cy + 64, `Score: ${this.score.toLocaleString()} pts`, {
+    this.add.text(cx, cy + 62, `Score: ${this.score.toLocaleString()} pts`, {
       fontSize: '15px', fontFamily: 'Arial', color: '#cccccc',
     }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
 
-    this.add.text(cx, cy + 96, 'Press ENTER to try again   |   ESC for Shop', {
-      fontSize: '14px', fontFamily: 'Arial', color: '#aaaaaa',
-      stroke: '#000000', strokeThickness: 2,
-    }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
-
+    // Clickable buttons — more reliable than keyboard listeners after a scene shock
     const bikeId = this.bike.bikeId;
-    const enterKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-    enterKey.once('down', () => {
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(SCENE.GAME, { bikeId }));
-    });
-    this.escKey.once('down', () => {
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(SCENE.SHOP));
-    });
+
+    const btnRetry = this.add.text(cx - 120, cy + 108, '[ TRY AGAIN ]', {
+      fontSize: '18px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: '#52b788', stroke: '#000000', strokeThickness: 3,
+      backgroundColor: '#00000088', padding: { x: 12, y: 8 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101).setInteractive({ useHandCursor: true });
+    btnRetry.on('pointerover', () => btnRetry.setColor('#ffffff'));
+    btnRetry.on('pointerout',  () => btnRetry.setColor('#52b788'));
+    btnRetry.on('pointerdown', () => this.scene.start(SCENE.GAME, { bikeId }));
+
+    const btnShop = this.add.text(cx + 110, cy + 108, '[ CHANGE BIKE ]', {
+      fontSize: '18px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: '#2a78c7', stroke: '#000000', strokeThickness: 3,
+      backgroundColor: '#00000088', padding: { x: 12, y: 8 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101).setInteractive({ useHandCursor: true });
+    btnShop.on('pointerover', () => btnShop.setColor('#ffffff'));
+    btnShop.on('pointerout',  () => btnShop.setColor('#2a78c7'));
+    btnShop.on('pointerdown', () => this.scene.start(SCENE.SHOP));
+
+    // Keyboard still works — listen directly on the input manager (avoids stale key objects)
+    this.input.keyboard!.once('keydown-ENTER', () => this.scene.start(SCENE.GAME, { bikeId }));
+    this.input.keyboard!.once('keydown-ESC',   () => this.scene.start(SCENE.SHOP));
   }
 
   private gameComplete(): void {
