@@ -13,6 +13,8 @@ export interface LevelConfig {
   subtitle:      string;
   attractionIds: string[];
   chasers:       ChaserDef[];
+  hasRivers:     boolean;
+  cameraZoom:    number;
 }
 
 // Base speed: 90 px/s
@@ -27,14 +29,18 @@ export const LEVELS: LevelConfig[] = [
     level:    1,
     name:     'Level 1',
     subtitle: 'A Grand Day Out',
-    attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'ucc', 'leefields'],
+    attractionIds: ['shandon', 'englishmarket', 'fitzgeralds', 'ucc'],
     chasers:  [],
+    hasRivers: false,
+    cameraZoom: 1.8,
   },
   {
     level:    2,
     name:     'Level 2',
     subtitle: "Mam's on the Warpath",
     attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'ucc', 'leefields', 'blarney', 'fota'],
+    hasRivers: true,
+    cameraZoom: 1.4,
     chasers: [
       { key: 'chaser_mam', name: 'Mam (Esther)',   catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
       { key: 'chaser_dad', name: 'Dad (Cillian)',   catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
@@ -45,6 +51,8 @@ export const LEVELS: LevelConfig[] = [
     name:     'Level 3',
     subtitle: 'Family Panic',
     attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'fota', 'ucc', 'leefields', 'stfinbarres', 'blackrock', 'blarney'],
+    hasRivers: true,
+    cameraZoom: 1.4,
     chasers: [
       { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
       { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
@@ -57,6 +65,8 @@ export const LEVELS: LevelConfig[] = [
     name:     'Level 4',
     subtitle: 'Maximum Chaos',
     attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'fota', 'ucc', 'leefields', 'stfinbarres', 'blackrock', 'blarney', 'pairc', 'thelough'],
+    hasRivers: true,
+    cameraZoom: 1.4,
     chasers: [
       { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
       { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },

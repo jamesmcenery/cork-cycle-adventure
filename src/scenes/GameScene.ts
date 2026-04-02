@@ -75,15 +75,16 @@ export class GameScene extends Phaser.Scene {
     };
 
     this.cameras.main.fadeIn(600);
-    this.showWelcome(lvl.name, lvl.subtitle, this.activeAttractions.length, lvl.chasers.length);
+    this.showWelcome(lvl.name, lvl.subtitle, this.activeAttractions.length, lvl.chasers.length, lvl.hasRivers);
     this.scene.launch(SCENE.UI, { gameScene: this });
     this.weatherTimer = 15000;
 
     this.time.delayedCall(100, () => {
-      this.events.emit('score',  this.score);
-      this.events.emit('stamps', [...this.visitedSet]);
-      this.events.emit('bikeId', data.bikeId);
-      this.events.emit('level',  this.currentLevel);
+      this.events.emit('score',           this.score);
+      this.events.emit('stamps',          [...this.visitedSet]);
+      this.events.emit('bikeId',          data.bikeId);
+      this.events.emit('level',           this.currentLevel);
+      this.events.emit('activeAttractions', this.activeAttractions.map(a => a.id));
     });
   }
 
@@ -206,7 +207,7 @@ export class GameScene extends Phaser.Scene {
   private setupCamera(): void {
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    this.cameras.main.setZoom(1.4);
+    this.cameras.main.setZoom(getLevelConfig(this.currentLevel).cameraZoom);
     this.cameras.main.centerOn(this.bike.x, this.bike.y);
     this.cameras.main.startFollow(this.bike, true, 0.12, 0.12);
   }
@@ -232,6 +233,14 @@ export class GameScene extends Phaser.Scene {
     this.applyWindForce();
     this.updateWeather(delta);
     this.checkAttractionProximity();
+
+    if (getLevelConfig(this.currentLevel).hasRivers) {
+      const tile = this.groundLayer.getTileAtWorldXY(this.bike.x, this.bike.y);
+      if (tile && tile.index === TILE.WATER) {
+        this.drownedInRiver();
+        return;
+      }
+    }
 
     const elapsed = this.getElapsedSeconds();
     for (const chaser of this.chasers) {
@@ -322,6 +331,65 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private drownedInRiver(): void {
+    this.caught = true; // reuse flag to stop update loop
+    this.scene.stop(SCENE.UI);
+
+    (this.bike.body as Phaser.Physics.Arcade.Body).setVelocity(0, 0);
+    this.cameras.main.stopFollow();
+    this.cameras.main.shake(400, 0.025);
+    this.cameras.main.flash(300, 30, 100, 200, false); // blue flash
+
+    const W = this.scale.width, H = this.scale.height;
+    const cx = W / 2, cy = H / 2;
+    const bikeId = this.bike.bikeId;
+    const level  = this.currentLevel;
+
+    const overlay = this.add.rectangle(cx, cy, W, H, 0x001133, 0)
+      .setScrollFactor(0).setDepth(100);
+    this.tweens.add({ targets: overlay, alpha: 0.82, duration: 600 });
+
+    this.add.text(cx, cy - 80, '💧 WASHED AWAY! 💧', {
+      fontSize: '34px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: '#48cae4', stroke: '#000000', strokeThickness: 6,
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
+
+    this.add.text(cx, cy - 28, 'Scott fell into the River Lee!', {
+      fontSize: '18px', fontFamily: 'Arial',
+      color: '#aaddff', stroke: '#000000', strokeThickness: 3,
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
+
+    this.add.text(cx, cy + 14, '"Stay on the roads, boy!"', {
+      fontSize: '15px', fontFamily: 'Arial', fontStyle: 'italic',
+      color: '#ffffff', stroke: '#000000', strokeThickness: 3,
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
+
+    this.add.text(cx, cy + 58, `Score: ${this.score.toLocaleString()} pts  ·  Level ${level}`, {
+      fontSize: '15px', fontFamily: 'Arial', color: '#cccccc',
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101);
+
+    const btnRetry = this.add.text(cx - 120, cy + 108, '[ TRY AGAIN ]', {
+      fontSize: '18px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: '#52b788', stroke: '#000000', strokeThickness: 3,
+      backgroundColor: '#00000088', padding: { x: 12, y: 8 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101).setInteractive({ useHandCursor: true });
+    btnRetry.on('pointerover', () => btnRetry.setColor('#ffffff'));
+    btnRetry.on('pointerout',  () => btnRetry.setColor('#52b788'));
+    btnRetry.on('pointerdown', () => this.scene.start(SCENE.GAME, { bikeId, level }));
+
+    const btnShop = this.add.text(cx + 110, cy + 108, '[ CHANGE BIKE ]', {
+      fontSize: '18px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: '#2a78c7', stroke: '#000000', strokeThickness: 3,
+      backgroundColor: '#00000088', padding: { x: 12, y: 8 },
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(101).setInteractive({ useHandCursor: true });
+    btnShop.on('pointerover', () => btnShop.setColor('#ffffff'));
+    btnShop.on('pointerout',  () => btnShop.setColor('#2a78c7'));
+    btnShop.on('pointerdown', () => this.scene.start(SCENE.SHOP, { level }));
+
+    this.input.keyboard!.once('keydown-ENTER', () => this.scene.start(SCENE.GAME, { bikeId, level }));
+    this.input.keyboard!.once('keydown-ESC',   () => this.scene.start(SCENE.SHOP, { level }));
+  }
+
   private caughtByChaser(chaser: Chaser): void {
     this.caught = true;
     this.scene.stop(SCENE.UI);
@@ -405,14 +473,18 @@ export class GameScene extends Phaser.Scene {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  private showWelcome(levelName: string, subtitle: string, attCount: number, chaserCount: number): void {
+  private showWelcome(levelName: string, subtitle: string, attCount: number, chaserCount: number, hasRivers: boolean): void {
     const chaserLine = chaserCount === 0
       ? "No family around — enjoy the freedom! 🎉"
       : `Watch out! ${chaserCount} family member${chaserCount > 1 ? 's are' : ' is'} after you!`;
+    const riverLine = hasRivers ? "⚠️ Stay off the rivers — you'll drown!" : "";
+
+    const lines = [`${levelName}: ${subtitle}`, `Visit ${attCount} attractions!`, chaserLine];
+    if (riverLine) lines.push(riverLine);
 
     const msg = this.add.text(
       SCOTT_START_WORLD_X, SCOTT_START_WORLD_Y - 130,
-      `${levelName}: ${subtitle}\nVisit ${attCount} attractions!\n${chaserLine}`,
+      lines.join('\n'),
       {
         fontSize: '17px', fontFamily: 'Arial', fontStyle: 'bold',
         color: '#ffffff', stroke: '#000000', strokeThickness: 4,

@@ -122,9 +122,11 @@ export function generateMap(level: number): number[][] {
     fill(64, 37, 16,  2, TILE.SIDEWALK);
   }
 
-  // ── 3. WATER — same for all levels ───────────────────────────────────────
-  fill(0,  9, MAP_COLS, 2, TILE.WATER);
-  fill(0, 13, MAP_COLS, 2, TILE.WATER);
+  // ── 3. WATER — level 2+ only (level 1 is river-free) ────────────────────
+  if (level >= 2) {
+    fill(0,  9, MAP_COLS, 2, TILE.WATER);
+    fill(0, 13, MAP_COLS, 2, TILE.WATER);
+  }
 
   // ── 4. ROADS — drawn LAST, override everything ────────────────────────────
   fill(20, 0, 2, MAP_ROWS, TILE.ROAD);

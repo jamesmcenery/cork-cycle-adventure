@@ -24,6 +24,7 @@ export class UIScene extends Phaser.Scene {
   private compassLabel!:    Phaser.GameObjects.Text;
   private compassDist!:     Phaser.GameObjects.Text;
   private visitedIds:       string[] = [];
+  private activeIds:        string[] = [];
   private currentPos        = { x: 0, y: 0 };
 
   // Controls hint (fades after first movement)
@@ -48,6 +49,7 @@ export class UIScene extends Phaser.Scene {
     gs.events.on('speed',   (v: number)   => { this.speedText.setText(`⚡ ${Math.round(v)} km/h`); if (v > 20 && !this.hasMoved) this.fadeControlsHint(); });
     gs.events.on('combo',   (v: number)   => this.updateCombo(v));
     gs.events.on('stamps',  (v: string[]) => { this.visitedIds = v; this.updateStamps(v); });
+    gs.events.on('activeAttractions', (ids: string[]) => { this.activeIds = ids; this.rebuildStampDots(ids); });
     gs.events.on('trick',   (r: { name: string; score: number }) => this.flashTrick(r));
     gs.events.on('weather', (w: string)   => this.weatherText.setText(w));
     gs.events.on('bikeId',  (id: string)  => this.bikeText.setText(`🚲 ${id.toUpperCase()}`));
@@ -249,7 +251,8 @@ export class UIScene extends Phaser.Scene {
   // ── Stamp dots ────────────────────────────────────────────────────────────
   private updateStamps(ids: string[]): void {
     this.stampDots.forEach((dot, i) => {
-      if (ids.includes(ATTRACTIONS[i].id)) {
+      const attId = this.activeIds[i];
+      if (attId && ids.includes(attId)) {
         dot.setText('●').setColor('#ffd60a');
         this.tweens.add({ targets: dot, scaleX: 1.6, scaleY: 1.6, duration: 220, yoyo: true });
       }
@@ -270,9 +273,30 @@ export class UIScene extends Phaser.Scene {
     this.miniDot.setPosition(rx, GAME_HEIGHT - 120 + ry);
   }
 
-  // ── Compass pointing to nearest unvisited attraction ─────────────────────
+  // ── Rebuild stamp dots to match only the active attractions ─────────────
+  private rebuildStampDots(activeIds: string[]): void {
+    this.stampDots.forEach(d => d.destroy());
+    this.stampDots = [];
+
+    const panW = 240 + Math.max(0, activeIds.length - 8) * 20;
+    const panH = 52;
+    const px   = GAME_WIDTH - panW;
+    const py   = GAME_HEIGHT - panH;
+
+    for (let i = 0; i < activeIds.length; i++) {
+      const x   = px + 10 + i * Math.min(27, (panW - 20) / activeIds.length);
+      const dot = this.add.text(x, py + 32, '○', {
+        fontSize: '19px', fontFamily: 'Arial', color: '#444',
+      }).setOrigin(0, 0.5);
+      this.stampDots.push(dot);
+    }
+  }
+
+  // ── Compass pointing to nearest unvisited ACTIVE attraction ──────────────
   private updateCompass(pos: { x: number; y: number }): void {
-    const remaining = ATTRACTIONS.filter(a => !this.visitedIds.includes(a.id));
+    const remaining = ATTRACTIONS.filter(a =>
+      this.activeIds.includes(a.id) && !this.visitedIds.includes(a.id)
+    );
     if (remaining.length === 0) {
       this.compassArrow.clear();
       this.compassLabel.setText('ALL DONE! 🏆');
