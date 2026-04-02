@@ -76,7 +76,7 @@ export class GameScene extends Phaser.Scene {
 
     this.cameras.main.fadeIn(600);
     this.showWelcome(lvl.name, lvl.subtitle, this.activeAttractions.length, lvl.chasers.length, lvl.hasRivers);
-    this.scene.launch(SCENE.UI, { gameScene: this });
+    this.scene.launch(SCENE.UI, { gameScene: this, level: this.currentLevel });
     this.weatherTimer = 15000;
 
     this.time.delayedCall(100, () => {

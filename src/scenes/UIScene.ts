@@ -3,7 +3,7 @@ import { GAME_WIDTH, GAME_HEIGHT, SCENE, WORLD_WIDTH, WORLD_HEIGHT, TILE_SIZE } 
 import { ATTRACTIONS, attractionWorldX, attractionWorldY } from '../data/attractions';
 import { GameScene } from './GameScene';
 
-interface UIData { gameScene: GameScene; }
+interface UIData { gameScene: GameScene; level: number; }
 
 export class UIScene extends Phaser.Scene {
   private scoreText!:    Phaser.GameObjects.Text;
@@ -44,7 +44,7 @@ export class UIScene extends Phaser.Scene {
     this.buildMiniMap();
     this.buildWeatherLabel();
     this.buildCompass();
-    this.buildControlsHint();
+    if (data.level === 1) this.buildControlsHint();
 
     const gs = this.scene.get(SCENE.GAME);
     gs.events.on('score',   (v: number)   => this.scoreText.setText(`🏆 ${v.toLocaleString()} pts`));
