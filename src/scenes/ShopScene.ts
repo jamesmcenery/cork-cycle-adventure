@@ -10,10 +10,12 @@ export class ShopScene extends Phaser.Scene {
   private cursor!: Phaser.Types.Input.Keyboard.CursorKeys;
   private enterKey!: Phaser.Input.Keyboard.Key;
   private shopkeeperTxt!: Phaser.GameObjects.Text;
+  private currentLevel = 1;
 
   constructor() { super({ key: SCENE.SHOP }); }
 
-  create(): void {
+  create(data: { level?: number }): void {
+    this.currentLevel = data?.level ?? 1;
     this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'shop_bg');
 
     this.add.text(GAME_WIDTH / 2, 38, 'CHOOSE YOUR BIKE, SCOTT!', {
@@ -215,9 +217,10 @@ export class ShopScene extends Phaser.Scene {
 
   private startRide(): void {
     const bikeId = BIKE_ORDER[this.selectedIndex];
+    const level  = this.currentLevel;
     this.cameras.main.fadeOut(500, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start(SCENE.GAME, { bikeId });
+      this.scene.start(SCENE.GAME, { bikeId, level });
     });
   }
 }

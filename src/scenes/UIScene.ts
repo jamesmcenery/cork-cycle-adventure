@@ -12,6 +12,7 @@ export class UIScene extends Phaser.Scene {
   private comboText!:    Phaser.GameObjects.Text;
   private weatherText!:  Phaser.GameObjects.Text;
   private bikeText!:     Phaser.GameObjects.Text;
+  private levelText!:    Phaser.GameObjects.Text;
   private stampDots:     Phaser.GameObjects.Text[] = [];
   private trickBanner!:  Phaser.GameObjects.Text;
   private trickTween:    Phaser.Tweens.Tween | null = null;
@@ -50,6 +51,7 @@ export class UIScene extends Phaser.Scene {
     gs.events.on('trick',   (r: { name: string; score: number }) => this.flashTrick(r));
     gs.events.on('weather', (w: string)   => this.weatherText.setText(w));
     gs.events.on('bikeId',  (id: string)  => this.bikeText.setText(`🚲 ${id.toUpperCase()}`));
+    gs.events.on('level',   (v: number)   => this.levelText.setText(`LVL ${v}`));
     gs.events.on('bikePos', (p: { x: number; y: number }) => {
       this.currentPos = p;
       this.updateMiniDot(p);
@@ -92,6 +94,10 @@ export class UIScene extends Phaser.Scene {
     this.comboText = this.add.text(660, 13, '', {
       fontSize: '17px', fontFamily: 'Arial', fontStyle: 'bold',
       color: '#ff9f1c', stroke: '#000', strokeThickness: 3,
+    });
+    this.levelText = this.add.text(GAME_WIDTH - 72, 13, 'LVL 1', {
+      fontSize: '17px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: '#ffd60a', stroke: '#000', strokeThickness: 3,
     });
     this.add.text(GAME_WIDTH - 10, 13, 'ESC = Shop', {
       fontSize: '12px', fontFamily: 'Arial', color: '#666',

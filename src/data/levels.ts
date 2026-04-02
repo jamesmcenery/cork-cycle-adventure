@@ -1,0 +1,75 @@
+export interface ChaserDef {
+  key:       string;
+  name:      string;
+  catchMsg:  string;
+  startCol:  number;
+  startRow:  number;
+  speed:     number;
+}
+
+export interface LevelConfig {
+  level:         number;
+  name:          string;
+  subtitle:      string;
+  attractionIds: string[];
+  chasers:       ChaserDef[];
+}
+
+// Base speed: 90 px/s
+// Mam/Dad ≈ 1× · Finn/Culann = 1.5× · James/Therese = 2×
+const S  = 90;   // mam
+const SD = 85;   // dad (slightly slower)
+const SF = Math.round(S * 1.5);  // finn / culann
+const SJ = S * 2;                // james / therese
+
+export const LEVELS: LevelConfig[] = [
+  {
+    level:    1,
+    name:     'Level 1',
+    subtitle: 'A Grand Day Out',
+    attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'ucc', 'leefields'],
+    chasers:  [],
+  },
+  {
+    level:    2,
+    name:     'Level 2',
+    subtitle: "Mam's on the Warpath",
+    attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'ucc', 'leefields', 'blarney', 'fota'],
+    chasers: [
+      { key: 'chaser_mam', name: 'Mam (Esther)',   catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
+      { key: 'chaser_dad', name: 'Dad (Cillian)',   catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
+    ],
+  },
+  {
+    level:    3,
+    name:     'Level 3',
+    subtitle: 'Family Panic',
+    attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'fota', 'ucc', 'leefields', 'stfinbarres', 'blackrock', 'blarney'],
+    chasers: [
+      { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
+      { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
+      { key: 'chaser_finn',   name: 'Finn (Big Bro)',     catchMsg: "Mam is going MENTAL — come home!",                startCol: 40, startRow: 55, speed: SF },
+      { key: 'chaser_culann', name: 'Culann (Oldest Bro)',catchMsg: "Seriously Scott, get in!",                        startCol:  5, startRow: 18, speed: SF },
+    ],
+  },
+  {
+    level:    4,
+    name:     'Level 4',
+    subtitle: 'Maximum Chaos',
+    attractionIds: ['shandon', 'gaol', 'englishmarket', 'fitzgeralds', 'fota', 'ucc', 'leefields', 'stfinbarres', 'blackrock', 'blarney', 'pairc', 'thelough'],
+    chasers: [
+      { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
+      { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
+      { key: 'chaser_finn',   name: 'Finn (Big Bro)',     catchMsg: "Mam is going MENTAL — come home!",                startCol: 40, startRow: 55, speed: SF },
+      { key: 'chaser_culann', name: 'Culann (Oldest Bro)',catchMsg: "Seriously Scott, get in!",                        startCol:  5, startRow: 18, speed: SF },
+      { key: 'chaser_uncle',  name: 'Uncle James',        catchMsg: "Your mam sent me to find you, boy!",              startCol:  8, startRow: 42, speed: SJ },
+      { key: 'chaser_auntie', name: 'Auntie Therese',     catchMsg: "Scott! You've school in the morning!",            startCol: 62, startRow:  5, speed: SJ },
+    ],
+  },
+];
+
+export function getLevelConfig(level: number): LevelConfig {
+  return LEVELS[Math.min(level, LEVELS.length) - 1];
+}
+
+export const MAX_LEVEL = LEVELS.length;

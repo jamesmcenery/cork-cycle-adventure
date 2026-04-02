@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT, SCENE } from '../constants';
 import { ATTRACTIONS } from '../data/attractions';
+import { getLevelConfig, MAX_LEVEL } from '../data/levels';
 import SaveManager from '../utils/SaveManager';
 
 interface PassportData {
@@ -8,6 +9,7 @@ interface PassportData {
   stamps:     string[];
   bikeId:     string;
   elapsedSec: number;
+  level:      number;
 }
 
 export class PassportScene extends Phaser.Scene {
@@ -24,34 +26,36 @@ export class PassportScene extends Phaser.Scene {
     this.spawnConfetti();
 
     // Header
-    this.add.text(GAME_WIDTH / 2, 44, '🏆 PASSPORT COMPLETE! 🏆', {
-      fontSize:   '26px',
-      fontFamily: 'Arial',
-      fontStyle:  'bold',
-      color:      '#ffd60a',
-      stroke:     '#000000',
-      strokeThickness: 5,
+    const isGameWon = data.level >= MAX_LEVEL;
+    const headerTxt = isGameWon ? '🏆 CORK CONQUERED! 🏆' : `🏆 LEVEL ${data.level} COMPLETE! 🏆`;
+    this.add.text(GAME_WIDTH / 2, 38, headerTxt, {
+      fontSize:   '26px', fontFamily: 'Arial', fontStyle: 'bold',
+      color:      '#ffd60a', stroke: '#000000', strokeThickness: 5,
+    }).setOrigin(0.5);
+
+    const lvlCfg = getLevelConfig(data.level);
+    this.add.text(GAME_WIDTH / 2, 64, lvlCfg.subtitle, {
+      fontSize:   '14px', fontFamily: 'Arial', fontStyle: 'italic',
+      color:      '#aaddff', stroke: '#000000', strokeThickness: 2,
     }).setOrigin(0.5);
 
     // Score & time
     const mins = Math.floor(data.elapsedSec / 60).toString().padStart(2, '0');
     const secs = (data.elapsedSec % 60).toString().padStart(2, '0');
-    this.add.text(GAME_WIDTH / 2, 78, `Score: ${data.score.toLocaleString()} pts   Time: ${mins}:${secs}`, {
-      fontSize:   '16px',
-      fontFamily: 'Arial',
-      color:      '#ffffff',
-      stroke:     '#000000',
-      strokeThickness: 3,
+    this.add.text(GAME_WIDTH / 2, 84, `Score: ${data.score.toLocaleString()} pts   Time: ${mins}:${secs}`, {
+      fontSize:   '15px', fontFamily: 'Arial',
+      color:      '#ffffff', stroke: '#000000', strokeThickness: 3,
     }).setOrigin(0.5);
 
-    // Stamps grid
-    const cols  = 4;
+    // Stamps grid — only show attractions for this level
+    const activeAtts = ATTRACTIONS.filter(a => lvlCfg.attractionIds.includes(a.id));
+    const cols   = 4;
     const startX = GAME_WIDTH / 2 - (cols - 1) * 80 - 40;
-    ATTRACTIONS.forEach((att, i) => {
+    activeAtts.forEach((att, i) => {
       const col   = i % cols;
       const row   = Math.floor(i / cols);
       const x     = startX + col * 160;
-      const y     = 200 + row * 105;
+      const y     = 204 + row * 105;
       const got   = data.stamps.includes(att.id);
       const color = '#' + att.stamptint.toString(16).padStart(6, '0');
 
@@ -90,7 +94,7 @@ export class PassportScene extends Phaser.Scene {
     this.promptNameEntry(data);
 
     // Buttons
-    this.buildButtons(data.bikeId);
+    this.buildButtons(data.bikeId, data.level ?? 1);
   }
 
   private promptNameEntry(data: PassportData): void {
@@ -152,47 +156,34 @@ export class PassportScene extends Phaser.Scene {
     });
   }
 
-  private buildButtons(bikeId: string): void {
-    const playAgainBtn = this.add.text(GAME_WIDTH / 2 - 110, GAME_HEIGHT - 30, '[ PLAY AGAIN ]', {
-      fontSize:   '18px',
-      fontFamily: 'Arial',
-      fontStyle:  'bold',
-      color:      '#52b788',
-      stroke:     '#000000',
-      strokeThickness: 3,
-      backgroundColor: '#00000088',
-      padding:    { x: 12, y: 8 },
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+  private buildButtons(bikeId: string, level: number): void {
+    const isGameWon  = level >= MAX_LEVEL;
+    const nextLevel  = level + 1;
 
-    playAgainBtn.on('pointerover', () => playAgainBtn.setColor('#ffffff'));
-    playAgainBtn.on('pointerout',  () => playAgainBtn.setColor('#52b788'));
-    playAgainBtn.on('pointerdown', () => {
+    // Next Level / Play Again button
+    const mainLabel  = isGameWon ? '[ PLAY AGAIN (LVL 1) ]' : `[ NEXT LEVEL → LVL ${nextLevel} ]`;
+    const mainColor  = isGameWon ? '#ffd60a' : '#52b788';
+    const mainBtn = this.add.text(GAME_WIDTH / 2 - 120, GAME_HEIGHT - 30, mainLabel, {
+      fontSize: '16px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: mainColor, stroke: '#000000', strokeThickness: 3,
+      backgroundColor: '#00000088', padding: { x: 10, y: 8 },
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    mainBtn.on('pointerover', () => mainBtn.setColor('#ffffff'));
+    mainBtn.on('pointerout',  () => mainBtn.setColor(mainColor));
+    mainBtn.on('pointerdown', () => {
       SaveManager.clearStamps();
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start(SCENE.GAME, { bikeId });
-      });
+      this.scene.start(SCENE.GAME, { bikeId, level: isGameWon ? 1 : nextLevel });
     });
 
-    const shopBtn = this.add.text(GAME_WIDTH / 2 + 110, GAME_HEIGHT - 30, '[ CHANGE BIKE ]', {
-      fontSize:   '18px',
-      fontFamily: 'Arial',
-      fontStyle:  'bold',
-      color:      '#2a78c7',
-      stroke:     '#000000',
-      strokeThickness: 3,
-      backgroundColor: '#00000088',
-      padding:    { x: 12, y: 8 },
+    // Change Bike button (keeps same level)
+    const shopBtn = this.add.text(GAME_WIDTH / 2 + 120, GAME_HEIGHT - 30, '[ CHANGE BIKE ]', {
+      fontSize: '16px', fontFamily: 'Arial', fontStyle: 'bold',
+      color: '#2a78c7', stroke: '#000000', strokeThickness: 3,
+      backgroundColor: '#00000088', padding: { x: 10, y: 8 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
     shopBtn.on('pointerover', () => shopBtn.setColor('#ffffff'));
     shopBtn.on('pointerout',  () => shopBtn.setColor('#2a78c7'));
-    shopBtn.on('pointerdown', () => {
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
-        this.scene.start(SCENE.SHOP);
-      });
-    });
+    shopBtn.on('pointerdown', () => this.scene.start(SCENE.SHOP, { level: isGameWon ? 1 : nextLevel }));
   }
 
   private spawnConfetti(): void {

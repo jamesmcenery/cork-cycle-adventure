@@ -119,7 +119,7 @@ export class TitleScene extends Phaser.Scene {
   private startGame(): void {
     this.cameras.main.fadeOut(400, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start(SCENE.SHOP);
+      this.scene.start(SCENE.SHOP, { level: 1 });
     });
   }
 }

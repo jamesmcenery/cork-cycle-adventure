@@ -19,16 +19,15 @@ export interface Attraction {
 //   Lee spur: cols  8-9,  rows 35-49
 
 export const ATTRACTIONS: Attraction[] = [
+  // ── Original 8 ───────────────────────────────────────────────────────────────
   {
     id:          'shandon',
     name:        'Shandon Bells & Tower',
     shortName:   'Shandon',
     description: "Ring the famous bells — 360° views over Cork City.",
     emoji:       '🔔',
-    tileCol:     40,  // V2 spine, row 3 — north end of Magazine Road
-    tileRow:     3,
-    points:      400,
-    stamptint:   0xff9f1c,
+    tileCol:     40, tileRow: 3,
+    points:      400, stamptint: 0xff9f1c,
     visitMsg:    "BONG! BONG! Shandon bells ring for Scott!",
   },
   {
@@ -37,10 +36,8 @@ export const ATTRACTIONS: Attraction[] = [
     shortName:   'City Gaol',
     description: "Spooky 19th-century prison, north of the river.",
     emoji:       '🏰',
-    tileCol:     20,  // V1 spine, row 3 — north end of west spine
-    tileRow:     3,
-    points:      350,
-    stamptint:   0x9b2335,
+    tileCol:     20, tileRow: 3,
+    points:      350, stamptint: 0x9b2335,
     visitMsg:    "Escaped from Cork City Gaol!",
   },
   {
@@ -49,10 +46,8 @@ export const ATTRACTIONS: Attraction[] = [
     shortName:   'English Market',
     description: "Trading since 1788 — the heart of Cork food culture.",
     emoji:       '🥩',
-    tileCol:     40,  // V2 spine, row 16 — city island between channels
-    tileRow:     16,
-    points:      300,
-    stamptint:   0xc77dff,
+    tileCol:     40, tileRow: 16,
+    points:      300, stamptint: 0xc77dff,
     visitMsg:    "Grand bit of shopping there, boy!",
   },
   {
@@ -61,10 +56,8 @@ export const ATTRACTIONS: Attraction[] = [
     shortName:   "Fitz's Park",
     description: "Cork's favourite riverside park — statues and ducks.",
     emoji:       '🌳',
-    tileCol:     20,  // V1 spine, row 25 — V1 cutting through the park
-    tileRow:     25,
-    points:      250,
-    stamptint:   0x52b788,
+    tileCol:     20, tileRow: 25,
+    points:      250, stamptint: 0x52b788,
     visitMsg:    "Lovely day for a ride in the park!",
   },
   {
@@ -73,10 +66,8 @@ export const ATTRACTIONS: Attraction[] = [
     shortName:   'Fota',
     description: "100 acres of wild animals — giraffes, cheetahs and more.",
     emoji:       '🦒',
-    tileCol:     62,  // V3 spine × H2 city road intersection
-    tileRow:     18,
-    points:      450,
-    stamptint:   0xfb5607,
+    tileCol:     62, tileRow: 18,
+    points:      450, stamptint: 0xfb5607,
     visitMsg:    "The giraffes wave at Scott!",
   },
   {
@@ -85,10 +76,8 @@ export const ATTRACTIONS: Attraction[] = [
     shortName:   'UCC',
     description: "Ireland's oldest university — gorgeous limestone quads.",
     emoji:       '🎓',
-    tileCol:     40,  // V2 spine, row 50 — south end
-    tileRow:     50,
-    points:      300,
-    stamptint:   0x4361ee,
+    tileCol:     40, tileRow: 50,
+    points:      300, stamptint: 0x4361ee,
     visitMsg:    "Go Leesiders! UCC stamp collected!",
   },
   {
@@ -97,10 +86,8 @@ export const ATTRACTIONS: Attraction[] = [
     shortName:   'Lee Fields',
     description: "Wide open flood plains beside the River Lee.",
     emoji:       '🌿',
-    tileCol:     8,   // Lee Fields spur, row 43
-    tileRow:     43,
-    points:      200,
-    stamptint:   0x95d5b2,
+    tileCol:     8, tileRow: 43,
+    points:      200, stamptint: 0x95d5b2,
     visitMsg:    "Fresh air from the Lee — deadly!",
   },
   {
@@ -109,11 +96,53 @@ export const ATTRACTIONS: Attraction[] = [
     shortName:   'Blarney',
     description: "Kiss the Blarney Stone and get the gift of the gab.",
     emoji:       '🏯',
-    tileCol:     5,   // H3 western road, far west end
-    tileRow:     35,
-    points:      500,
-    stamptint:   0x606c38,
+    tileCol:     5, tileRow: 35,
+    points:      500, stamptint: 0x606c38,
     visitMsg:    "The gift of the gab — acquired!",
+  },
+
+  // ── Level 3+ attractions ──────────────────────────────────────────────────────
+  {
+    id:          'stfinbarres',
+    name:        "St Fin Barre's Cathedral",
+    shortName:   "St Fin Barre's",
+    description: "Stunning French Gothic cathedral — three spires over the city.",
+    emoji:       '⛪',
+    tileCol:     40, tileRow: 38,
+    points:      400, stamptint: 0xe0c080,
+    visitMsg:    "Three spires, pure class! St Fin Barre's stamped!",
+  },
+  {
+    id:          'blackrock',
+    name:        'Blackrock Castle',
+    shortName:   'Blackrock',
+    description: "16th-century riverside castle — now a cool observatory.",
+    emoji:       '🌌',
+    tileCol:     62, tileRow: 45,
+    points:      450, stamptint: 0x3a0ca3,
+    visitMsg:    "Stars and castles — deadly combo!",
+  },
+
+  // ── Level 4+ attractions ──────────────────────────────────────────────────────
+  {
+    id:          'pairc',
+    name:        "Páirc Uí Chaoimh",
+    shortName:   'Páirc',
+    description: "Cork GAA's iconic stadium — home of the Rebels.",
+    emoji:       '🏟️',
+    tileCol:     62, tileRow: 52,
+    points:      500, stamptint: 0xcc0000,
+    visitMsg:    "Up the Rebels! Páirc Uí Chaoimh stamped!",
+  },
+  {
+    id:          'thelough',
+    name:        'The Lough',
+    shortName:   'The Lough',
+    description: "Cork's own lake — swans, ducks, and Sunday strollers.",
+    emoji:       '🦢',
+    tileCol:     20, tileRow: 45,
+    points:      300, stamptint: 0x48cae4,
+    visitMsg:    "The swans salute Scott!",
   },
 ];
 
