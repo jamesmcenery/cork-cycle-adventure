@@ -182,7 +182,7 @@ export class GameScene extends Phaser.Scene {
       const c = new Chaser(
         this, def.startCol, def.startRow,
         def.key, def.name, def.catchMsg,
-        def.speed, this.groundLayer,
+        def.speed, this.groundLayer, def.mapTint,
       );
       this.chasers.push(c);
     }
@@ -255,6 +255,9 @@ export class GameScene extends Phaser.Scene {
     this.events.emit('speed',  Math.abs(this.bike.speed));
     this.events.emit('combo',  this.bike.combo);
     this.events.emit('bikePos', { x: this.bike.x, y: this.bike.y });
+    if (this.chasers.length > 0) {
+      this.events.emit('chaserPositions', this.chasers.map(c => ({ x: c.x, y: c.y, tint: c.mapTint })));
+    }
   }
 
   private applyTileSpeedUnderBike(): void {

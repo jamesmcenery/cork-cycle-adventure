@@ -17,6 +17,8 @@ export class UIScene extends Phaser.Scene {
   private trickBanner!:  Phaser.GameObjects.Text;
   private trickTween:    Phaser.Tweens.Tween | null = null;
   private miniDot!:      Phaser.GameObjects.Image;
+  private chaserDots:    Phaser.GameObjects.Arc[] = [];
+  private attDots:       Phaser.GameObjects.Graphics[] = [];
   private gameScene!:    GameScene;
 
   // Nearest-attraction compass
@@ -49,7 +51,26 @@ export class UIScene extends Phaser.Scene {
     gs.events.on('speed',   (v: number)   => { this.speedText.setText(`⚡ ${Math.round(v)} km/h`); if (v > 20 && !this.hasMoved) this.fadeControlsHint(); });
     gs.events.on('combo',   (v: number)   => this.updateCombo(v));
     gs.events.on('stamps',  (v: string[]) => { this.visitedIds = v; this.updateStamps(v); });
-    gs.events.on('activeAttractions', (ids: string[]) => { this.activeIds = ids; this.rebuildStampDots(ids); });
+    gs.events.on('activeAttractions', (ids: string[]) => {
+      this.activeIds = ids;
+      this.rebuildStampDots(ids);
+      this.buildMinimapAttractionDots(ids);
+    });
+    gs.events.on('chaserPositions', (positions: { x: number; y: number; tint: number }[]) => {
+      // Grow/shrink chaser dot array to match
+      while (this.chaserDots.length < positions.length) {
+        const dot = this.add.circle(0, 0, 3, 0xff4444).setDepth(6);
+        this.chaserDots.push(dot);
+      }
+      while (this.chaserDots.length > positions.length) {
+        this.chaserDots.pop()!.destroy();
+      }
+      positions.forEach((p, i) => {
+        const rx = (p.x / WORLD_WIDTH)  * 160;
+        const ry = (p.y / WORLD_HEIGHT) * 120;
+        this.chaserDots[i].setPosition(rx, GAME_HEIGHT - 120 + ry).setFillStyle(p.tint);
+      });
+    });
     gs.events.on('trick',   (r: { name: string; score: number }) => this.flashTrick(r));
     gs.events.on('weather', (w: string)   => this.weatherText.setText(w));
     gs.events.on('bikeId',  (id: string)  => this.bikeText.setText(`🚲 ${id.toUpperCase()}`));
@@ -142,19 +163,24 @@ export class UIScene extends Phaser.Scene {
     this.add.image(80, GAME_HEIGHT - 60, 'minimap_bg');
     this.miniDot = this.add.image(80, GAME_HEIGHT - 60, 'minimap_dot').setDepth(5);
 
-    // Draw attraction dots on minimap
-    for (const att of ATTRACTIONS) {
-      const rx = (attractionWorldX(att) / WORLD_WIDTH)  * 160;
-      const ry = (attractionWorldY(att) / WORLD_HEIGHT) * 120;
-      const dot = this.add.graphics();
-      const col = att.stamptint;
-      dot.fillStyle(col, 0.9);
-      dot.fillCircle(rx, GAME_HEIGHT - 120 + ry, 2);
-    }
+    // Attraction dots drawn later via rebuildStampDots / activeAttractions event
 
     this.add.text(5, GAME_HEIGHT - 122, 'MAP', {
       fontSize: '10px', fontFamily: 'Arial', color: '#888',
     });
+  }
+
+  private buildMinimapAttractionDots(activeIds: string[]): void {
+    this.attDots.forEach(d => d.destroy());
+    this.attDots = [];
+    for (const att of ATTRACTIONS.filter(a => activeIds.includes(a.id))) {
+      const rx = (attractionWorldX(att) / WORLD_WIDTH)  * 160;
+      const ry = (attractionWorldY(att) / WORLD_HEIGHT) * 120;
+      const dot = this.add.graphics().setDepth(4);
+      dot.fillStyle(att.stamptint, 0.9);
+      dot.fillCircle(rx, GAME_HEIGHT - 120 + ry, 2);
+      this.attDots.push(dot);
+    }
   }
 
   // ── Weather label (bottom centre) ────────────────────────────────────────

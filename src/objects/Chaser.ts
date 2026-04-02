@@ -7,6 +7,7 @@ const WALKABLE = new Set([0, 1, 2, 3, 6, 7, 8, 9]);
 export class Chaser extends Phaser.GameObjects.Container {
   readonly chaserName: string;
   readonly catchMsg:   string;
+  readonly mapTint:    number;
 
   private tileCol:      number;
   private tileRow:      number;
@@ -28,6 +29,7 @@ export class Chaser extends Phaser.GameObjects.Container {
     catchMsg:    string,
     speed:       number,
     groundLayer: Phaser.Tilemaps.TilemapLayer,
+    mapTint      = 0xff4444,
   ) {
     const wx = tileCol * TILE_SIZE + TILE_SIZE / 2;
     const wy = tileRow * TILE_SIZE + TILE_SIZE / 2;
@@ -35,6 +37,7 @@ export class Chaser extends Phaser.GameObjects.Container {
 
     this.chaserName  = name;
     this.catchMsg    = catchMsg;
+    this.mapTint     = mapTint;
     this.baseSpeed   = speed;
     this.groundLayer = groundLayer;
     this.tileCol     = tileCol;

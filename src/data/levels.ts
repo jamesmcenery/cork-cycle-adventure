@@ -5,6 +5,7 @@ export interface ChaserDef {
   startCol:  number;
   startRow:  number;
   speed:     number;
+  mapTint:   number;  // colour on minimap
 }
 
 export interface LevelConfig {
@@ -42,8 +43,8 @@ export const LEVELS: LevelConfig[] = [
     hasRivers: true,
     cameraZoom: 1.4,
     chasers: [
-      { key: 'chaser_mam', name: 'Mam (Esther)',   catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
-      { key: 'chaser_dad', name: 'Dad (Cillian)',   catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
+      { key: 'chaser_mam', name: 'Mam (Esther)',   catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S,  mapTint: 0xe63946 },
+      { key: 'chaser_dad', name: 'Dad (Cillian)',   catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD, mapTint: 0x2a78c7 },
     ],
   },
   {
@@ -54,10 +55,10 @@ export const LEVELS: LevelConfig[] = [
     hasRivers: true,
     cameraZoom: 1.4,
     chasers: [
-      { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
-      { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
-      { key: 'chaser_finn',   name: 'Finn (Big Bro)',     catchMsg: "Mam is going MENTAL — come home!",                startCol: 40, startRow: 55, speed: SF },
-      { key: 'chaser_culann', name: 'Culann (Oldest Bro)',catchMsg: "Seriously Scott, get in!",                        startCol:  5, startRow: 18, speed: SF },
+      { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S,  mapTint: 0xe63946 },
+      { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD, mapTint: 0x2a78c7 },
+      { key: 'chaser_finn',   name: 'Finn (Big Bro)',     catchMsg: "Mam is going MENTAL — come home!",                startCol: 40, startRow: 55, speed: SF, mapTint: 0x3a86ff },
+      { key: 'chaser_culann', name: 'Culann (Oldest Bro)',catchMsg: "Seriously Scott, get in!",                        startCol:  5, startRow: 18, speed: SF, mapTint: 0x2d6a4f },
     ],
   },
   {
@@ -68,12 +69,12 @@ export const LEVELS: LevelConfig[] = [
     hasRivers: true,
     cameraZoom: 1.4,
     chasers: [
-      { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S  },
-      { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD },
-      { key: 'chaser_finn',   name: 'Finn (Big Bro)',     catchMsg: "Mam is going MENTAL — come home!",                startCol: 40, startRow: 55, speed: SF },
-      { key: 'chaser_culann', name: 'Culann (Oldest Bro)',catchMsg: "Seriously Scott, get in!",                        startCol:  5, startRow: 18, speed: SF },
-      { key: 'chaser_uncle',  name: 'Uncle James',        catchMsg: "Your mam sent me to find you, boy!",              startCol:  8, startRow: 42, speed: SJ },
-      { key: 'chaser_auntie', name: 'Auntie Therese',     catchMsg: "Scott! You've school in the morning!",            startCol: 62, startRow:  5, speed: SJ },
+      { key: 'chaser_mam',    name: 'Mam (Esther)',      catchMsg: "Scott! Home NOW — homework time!",                startCol: 20, startRow:  3, speed: S,  mapTint: 0xe63946 },
+      { key: 'chaser_dad',    name: 'Dad (Cillian)',      catchMsg: "Get home, son! The dinner's on the table!",       startCol: 62, startRow: 50, speed: SD, mapTint: 0x2a78c7 },
+      { key: 'chaser_finn',   name: 'Finn (Big Bro)',     catchMsg: "Mam is going MENTAL — come home!",                startCol: 40, startRow: 55, speed: SF, mapTint: 0x3a86ff },
+      { key: 'chaser_culann', name: 'Culann (Oldest Bro)',catchMsg: "Seriously Scott, get in!",                        startCol:  5, startRow: 18, speed: SF, mapTint: 0x2d6a4f },
+      { key: 'chaser_uncle',  name: 'Uncle James',        catchMsg: "Your mam sent me to find you, boy!",              startCol:  8, startRow: 42, speed: SJ, mapTint: 0x8338ec },
+      { key: 'chaser_auntie', name: 'Auntie Therese',     catchMsg: "Scott! You've school in the morning!",            startCol: 62, startRow:  5, speed: SJ, mapTint: 0xe07a5f },
     ],
   },
 ];
