@@ -168,12 +168,17 @@ export class PassportScene extends Phaser.Scene {
       color: mainColor, stroke: '#000000', strokeThickness: 3,
       backgroundColor: '#00000088', padding: { x: 10, y: 8 },
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    mainBtn.on('pointerover', () => mainBtn.setColor('#ffffff'));
-    mainBtn.on('pointerout',  () => mainBtn.setColor(mainColor));
-    mainBtn.on('pointerdown', () => {
+    const goNext = () => {
       SaveManager.clearStamps();
       this.scene.start(SCENE.GAME, { bikeId, level: isGameWon ? 1 : nextLevel });
-    });
+    };
+
+    mainBtn.on('pointerover', () => mainBtn.setColor('#ffffff'));
+    mainBtn.on('pointerout',  () => mainBtn.setColor(mainColor));
+    mainBtn.on('pointerdown', goNext);
+
+    this.input.keyboard!.on('keydown-ENTER', goNext);
+    this.input.keyboard!.on('keydown-SPACE', goNext);
 
     // Change Bike button (keeps same level)
     const shopBtn = this.add.text(GAME_WIDTH / 2 + 120, GAME_HEIGHT - 30, '[ CHANGE BIKE ]', {
